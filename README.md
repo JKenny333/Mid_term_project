@@ -64,4 +64,4 @@ Our output variable is a score between 0 and 10.
 
 *Friday*
 
-**Deliver our Presentation:** Confidently present our project, articulating the problem, the approach, key findings, and the implications of your results. Engage with our audience during the Q&A session to address their questions and feedback.
+**Deliver our Presentation:** Confidently present our project, articulating the problem, the approach, key findings, and the implications of our results. Engage with our audience during the Q&A session to address their questions and feedback.
