@@ -128,3 +128,69 @@ def replace_strings_from_dict(df, column_name, replace_dict):
 
     return df
 
+    # Performs linear regression delivering R2, adjusted R2 and coefficients 
+
+def linear_regression(X_train, X_test, y_train, y_test):
+    # Linear regression
+    lm = LinearRegression()
+    model = lm.fit(X_train, y_train)
+    print(f'model coefficients:\n {model.coef_}\n')
+    print(f'model intercept:\n {model.intercept_}\n')
+    
+    # Applying model to X test
+    y_pred = model.predict(X_test)
+    
+    # Ensure y_test is in the correct format (pandas Series or 1D numpy array)
+    if isinstance(y_test, pd.Series):
+        y_test_reset = y_test.reset_index(drop=True)
+    else:
+        y_test_reset = y_test  # Assuming y_test is already a numpy array
+    
+    # Creating combined table with y_test and y_pred
+    # Check if y_test_reset is a pandas Series and convert y_pred to a similar type
+    if isinstance(y_test_reset, pd.Series):
+        y_pred_series = pd.Series(y_pred, index=y_test_reset.index, name='y_pred')
+        residuals_df = pd.concat([y_test_reset, y_pred_series], axis=1)
+    else:
+        # If inputs are numpy arrays, stack them horizontally
+        residuals_df = np.column_stack((y_test_reset, y_pred))
+        # Convert to DataFrame for easier manipulation later on
+        residuals_df = pd.DataFrame(residuals_df, columns=["y_test", "y_pred"])
+    
+    # Calculating residuals
+    residuals_df["residual"] = residuals_df["y_test"] - residuals_df["y_pred"]
+    print(f'Residuals:\n {residuals_df}\n')
+
+    # Root mean squared error
+    rmse = mse(y_test_reset, residuals_df["y_pred"], squared=False)
+    print(f'Root mean squared error: {rmse} \n')
+
+    # R^2
+    r2 = r2_score(y_test_reset, residuals_df["y_pred"])
+    print(f'R2: {r2} \n')
+
+    # Calculating adjusted R^2
+    n = X_train.shape[0]  # Number of observations in the training set
+    p = X_train.shape[1]  # Number of features used for training
+    adjusted_r2 = 1 - (1 - r2) * (n - 1) / (n - p - 1)
+    print(f'Adjusted R2: {adjusted_r2} \n')
+
+    return model.coef_
+
+# Handles outliers 
+
+def outlier_thresholds(dataframe, variable):
+    quartile1 = dataframe[variable].quantile(0.25)
+    quartile3 = dataframe[variable].quantile(0.75)
+    interquantile_range = quartile3 - quartile1
+    up_limit = quartile3 + 1.5 * interquantile_range
+    low_limit = quartile1 - 1.5 * interquantile_range
+    return low_limit, up_limit
+
+def replace_with_thresholds(dataframe, variable):
+    low_limit, up_limit = outlier_thresholds(dataframe, variable)
+    dataframe.loc[(dataframe[variable] < low_limit), variable] = round(low_limit,5)
+    dataframe.loc[(dataframe[variable] > up_limit), variable] = round(up_limit,5)
+    
+
+
