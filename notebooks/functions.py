@@ -160,3 +160,72 @@ def apply_outlier_thresholds(dataframe):
         dataframe = handle_outliers(dataframe, col)
     return dataframe
 
+
+# List of features used in your model
+features = [
+    'fixed_acidity', 'volatile_acidity', 'citric_acid', 'residual_sugar',
+    'chlorides', 'total_sulfur_dioxide', 'density', 'pH', 'sulphates', 'alcohol'
+]
+
+import pandas as pd
+import numpy as np
+
+
+def predict_wine_quality(model, preprocessing_pipeline):
+    """
+    Prompts the user for input values for each feature within specified ranges,
+    preprocesses the input, and predicts wine quality.
+
+    Parameters:
+    - model: Trained model for predicting wine quality.
+    - preprocessing_pipeline: Pipeline for preprocessing the input features.
+
+    Returns:
+    - Prints the predicted wine quality.
+    """
+    # Define units and scales for each feature
+    feature_info = {
+        'fixed_acidity': {'unit': 'g/L', 'scale': (0, 20)},
+        'volatile_acidity': {'unit': 'g/L', 'scale': (0, 2)},
+        'citric_acid': {'unit': 'g/L', 'scale': (0, 1)},
+        'residual_sugar': {'unit': 'g/L', 'scale': (0, 200)},
+        'chlorides': {'unit': 'g/L', 'scale': (0, 0.2)},
+        'total_sulfur_dioxide': {'unit': 'ppm', 'scale': (0, 300)},
+        'density': {'unit': 'g/mL', 'scale': (0.98, 1.04)},
+        'pH': {'unit': 'pH scale', 'scale': (2.8, 4.0)},
+        'sulphates': {'unit': 'g/L', 'scale': (0, 2)},
+        'alcohol': {'unit': '% ABV', 'scale': (5, 15)}
+    }
+
+    # Initialize an empty dictionary to store user inputs
+    user_input = {}
+
+    # Iterate over each feature and prompt the user for input within the specified scale
+    for feature, info in feature_info.items():
+        while True:
+            # Prompt user for input, including the unit and scale
+            input_value = input(f"Enter value for {feature} ({info['unit']}, Scale: {info['scale'][0]}-{info['scale'][1]}): ")
+            
+            try:
+                input_value = float(input_value)  # Convert input to float
+                # Check if the input is within the scale
+                if info['scale'][0] <= input_value <= info['scale'][1]:
+                    user_input[feature] = input_value
+                    break  # Exit the loop if input is valid
+                else:
+                    print(f"Invalid input. Please enter a value within the scale {info['scale']}.")
+            except ValueError:
+                print("Invalid input. Please enter a numerical value.")
+    
+    # Convert the user inputs into a DataFrame to feed into the preprocessing pipeline and model
+    input_df = pd.DataFrame([user_input])
+
+    # Apply preprocessing to the input data
+    processed_input = preprocessing_pipeline.transform(input_df)
+
+    # Use the trained model to make a prediction
+    prediction_array = model.predict(processed_input)
+    prediction_output = round(float(prediction_array[0]), 1)
+
+    # Print the predicted wine quality
+    print(f"Predicted wine quality: {prediction_output}")
