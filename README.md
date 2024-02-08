@@ -42,7 +42,10 @@ The source of our data is here: https://archive.ics.uci.edu/dataset/186/wine+qua
   - Vino Metrics Presentation Skeleton - first draft of presentation
 
   **Visualisations** 
-  - Includes visualisations from Tableau
+  - Visualisations from Tableau
+
+  **Images**
+  - Vino Metrics logo 
 
 **Week plan**
 
