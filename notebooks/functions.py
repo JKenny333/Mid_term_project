@@ -76,57 +76,6 @@ def drop_dup_reset(data_frame):
     num_dups_deleted = rows_before - rows_after
     print(f'Deleted {num_dups_deleted} duplicates')
 
-def clean_sex_column(data_frame):
-    # Store the original 'sex' column for comparison
-    original_sex_column = data_frame['sex'].copy()
-
-    # Clean the 'sex' column
-    data_frame['sex'] = data_frame['sex'].str.strip().str.lower()
-    data_frame['sex'].replace({'male': 'm', 'female': 'f', 'femal': 'f'}, inplace=True)
-
-    # Define a set of valid values
-    valid_values = {'m', 'f'}
-
-    # Replace invalid entries with NaN
-    data_frame['sex'] = data_frame['sex'].apply(lambda x: x if x in valid_values else pd.NA)
-
-    # Calculate the number of changed values
-    changes = (original_sex_column.str.strip().str.lower() != data_frame['sex']).sum()
-    print(f"Number of values changed in the 'sex' column: {changes}")
-    print(data_frame['sex'].unique())
-
-    return data_frame
-
-def replace_strings_from_dict(df, column_name, replace_dict):
-    """
-    Replace entire strings in a DataFrame column based on multiple keywords, and print the number of changes for each.
-
-    Parameters:
-    df (pandas.DataFrame): The DataFrame to operate on.
-    column_name (str): The name of the column to clean.
-    replace_dict (dict): A dictionary where keys are keywords to search for, and values are the new values to replace the entire     string with.
-
-    Returns:
-    pandas.DataFrame: The DataFrame with the modified column.
-    """
-
-    # Check if column exists in DataFrame
-    if column_name not in df.columns:
-        raise ValueError(f"Column '{column_name}' not found in DataFrame")
-
-    for keyword, new_value in replace_dict.items():
-        # Use str.contains() to find rows where the column contains the keyword
-        mask = df[column_name].str.contains(keyword, case=False, na=False)
-
-        # Count the number of values that will be changed
-        num_changes = mask.sum()
-        if num_changes > 0:
-            print(f"Number of values changed for '{keyword}': {num_changes}")
-
-            # Replace the entire string in these rows with the new value
-            df.loc[mask, column_name] = new_value
-
-    return df
 
     # Performs linear regression delivering R2, adjusted R2 and coefficients 
 
@@ -192,5 +141,22 @@ def replace_with_thresholds(dataframe, variable):
     dataframe.loc[(dataframe[variable] < low_limit), variable] = round(low_limit,5)
     dataframe.loc[(dataframe[variable] > up_limit), variable] = round(up_limit,5)
     
+# Function to handle outliers
+def handle_outliers(dataframe, variable):
+    quartile1 = dataframe[variable].quantile(0.25)
+    quartile3 = dataframe[variable].quantile(0.75)
+    interquantile_range = quartile3 - quartile1
+    up_limit = quartile3 + 1.5 * interquantile_range
+    low_limit = quartile1 - 1.5 * interquantile_range
+    dataframe.loc[(dataframe[variable] < low_limit), variable] = round(low_limit, 5)
+    dataframe.loc[(dataframe[variable] > up_limit), variable] = round(up_limit, 5)
+    return dataframe
 
+# Apply outlier handling to specific columns
+def apply_outlier_thresholds(dataframe):
+    # Update this list to include only the columns that need outlier treatment
+    columns_to_treat = ['citric_acid', 'chlorides', 'total_sulfur_dioxide', 'pH', 'sulphates']
+    for col in columns_to_treat:
+        dataframe = handle_outliers(dataframe, col)
+    return dataframe
 
