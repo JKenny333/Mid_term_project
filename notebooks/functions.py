@@ -229,3 +229,62 @@ def predict_wine_quality(model, preprocessing_pipeline):
 
     # Print the predicted wine quality
     print(f"Predicted wine quality: {prediction_output}")
+    
+    
+def evaluate_model_performance(y_test, y_pred, X_train):
+    """
+    Evaluates the performance of a regression model by calculating and printing
+    the ME, MAE, MSE, RMSE, R^2, and adjusted R^2.
+
+    Parameters:
+    - y_test: pandas Series or DataFrame, actual target values.
+    - y_pred: array-like or pandas Series, predicted target values.
+    - X_train: pandas DataFrame, feature set used for training the model.
+
+    Returns:
+    - Prints the ME, MAE, MSE, RMSE, R^2, and adjusted R^2 of the model.
+    """
+    # Ensure y_pred is a DataFrame with appropriate column name
+    if not isinstance(y_pred, pd.DataFrame):
+        y_pred = pd.DataFrame(y_pred, columns=["y_pred"])
+    else:
+        y_pred = y_pred.rename(columns={y_pred.columns[0]: "y_pred"})
+
+    # Reset index and rename y_test for consistency
+    if isinstance(y_test, pd.Series):
+        y_test = y_test.reset_index(drop=True).rename("y_test")
+    elif isinstance(y_test, pd.DataFrame):
+        y_test = y_test.reset_index(drop=True)
+        y_test.columns = ["y_test"]
+
+    # Concatenate actual and predicted values and calculate residuals
+    residuals_df = pd.concat([y_test, y_pred], axis=1)
+    residuals_df["residual"] = residuals_df["y_test"] - residuals_df["y_pred"]
+
+    # Calculate Mean Error (ME)
+    me = residuals_df["residual"].mean()
+    print(f'Mean Error (ME): {me:.4f}')
+
+    # Calculate Mean Absolute Error (MAE)
+    mae_value = mae(residuals_df["y_test"], residuals_df["y_pred"])
+    print(f'Mean Absolute Error (MAE): {mae_value:.4f}')
+
+    # Calculate Mean Squared Error (MSE)
+    mse_value = mse(residuals_df["y_test"], residuals_df["y_pred"])
+    print(f'Mean Squared Error (MSE): {mse_value:.4f}')
+
+    # Calculate Root Mean Squared Error (RMSE)
+    rmse = mse(residuals_df["y_test"], residuals_df["y_pred"], squared=False)
+    print(f'Root Mean Squared Error (RMSE): {rmse:.4f}')
+
+    # Calculate R^2
+    r2 = r2_score(residuals_df["y_test"], residuals_df["y_pred"])
+    print(f'R²: {r2:.4f}')
+
+    # Calculate Adjusted R^2
+    n = X_train.shape[0]  # Number of observations
+    p = X_train.shape[1]  # Number of features
+    adjusted_r2 = 1 - (1 - r2) * (n - 1) / (n - p - 1)
+    print(f'Adjusted R²: {adjusted_r2:.4f}')
+
+
