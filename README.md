@@ -37,7 +37,7 @@ The source of our data is here: https://archive.ics.uci.edu/dataset/186/wine+qua
   **Notebooks**
   - includes .ipynb Notebooks used to conduct analysis and modeling
 
-  **Project Notes**
+  **Project Notes and Presentational Material**
   - Vino Metrics Project Notes - offers overview of decision-making and logic applied through the week
   - Vino Metrics Presentation Skeleton - first draft of presentation
 
