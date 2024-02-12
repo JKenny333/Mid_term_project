@@ -37,6 +37,17 @@ The source of our data is here: https://archive.ics.uci.edu/dataset/186/wine+qua
   **Notebooks**
   - includes .ipynb Notebooks used to conduct analysis and modeling
 
+    - 1 Wine Data Cleaning and Initial EDA 
+    - 2 Wine Detailed EDA 
+    - 3 Wine Data Outlier Identification 
+    - 4 Wine Preprocessing - Scaler testing 
+    - 5 Wine Preprocessing and Linear regression - red_df (_without improvement (scalers etc.) to generate a              baseline_)
+    - 6 Wine Preprocessing and Linear regression 
+    - 7 Wine Data Hypothesis testing (_this sheets generates F-statistic and prob F-statistic_) 
+    - 8 Wine Data Export Quality and Residuals (_export for visualisation on Tableau_) 
+    - 9 White Wine preprocessing and linear regression 
+    - 10 Wine quality predictor - (_tool for winemakers: generates quality prediction based on input_)
+
   **Project Notes and Presentational Material**
   - Vino Metrics Project Notes - offers overview of decision-making and logic applied through the week
   - Vino Metrics Presentation Skeleton - first draft of presentation
